@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeanoUno | Live Piano & Vocals</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --ink: #1a1a1a;
+      --muted: #6b6b6b;
+      --line: rgba(0,0,0,0.08);
+      --accent: #8a6a3f;
+      --max: 1100px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    .container {
+      width: min(calc(100% - 2rem), var(--max));
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    nav {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    section {
+      padding: 5rem 0;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      line-height: 1.1;
+      margin: 0;
+      max-width: 700px;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin: 0 0 1rem 0;
+    }
+
+    p {
+      color: var(--muted);
+      max-width: 650px;
+    }
+
+    .hero {
+      padding: 10rem 0 8rem;
+      background:
+        linear-gradient(rgba(0,0,0,0.28), rgba(0,0,0,0.28)),
+        url('assets/images/hero/deanouno-hero.jpeg') center 18% / cover no-repeat;
+      color: white;
+    }
+    .hero-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      max-width: 320px;
+      margin: 0 auto;
+    }    
+
+    .hero-inner {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .hero p {
+      margin-top: 1.5rem;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 0.95rem 1.2rem;
+      border-radius: 999px;
+      background: rgba(138,106,63,0.92);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 0;
+    }
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .gallery-grid img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+
+    .calendar-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .email-box {
+      border-top: 1px solid var(--line);
+      padding-top: 2rem;
+      margin-top: 2rem;
+    }
+
+    input {
+      padding: 0.8rem;
+      width: 100%;
+      margin-top: 0.5rem;
+      border: 1px solid var(--line);
+    }
+
+    footer {
+      padding: 3rem 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .about-photo img {
+      width: 100%;
+      max-width: 420px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      border-radius: 12px;
+    }    
+    @media (max-width: 800px) {
+      .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+      .split {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <div class="brand">DeanoUno</div>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#calendar">Calendar</a>
+      <a href="#booking">Booking</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+  <div class="hero-inner">
+      <!-- LOGO -->
+      <!-- Replace with your actual logo file -->
+    <img src="assets/logos/deano-logo.png" 
+        alt="DeanoUno logo"
+        style="max-width:220px; margin:0 auto 1.75rem; display:block;">
+      <!-- SIMPLE MESSAGE -->
+      <p style="margin:0 auto 2rem; max-width:500px; font-size:1.1rem; color:rgba(255,255,255,0.95);">
+        Thanks for stopping by.
+      </p>
+
+    <!-- MAIN ACTION BUTTONS -->
+    <div class="hero-buttons">
+      <a class="btn" href="#calendar">Where am I tonight?</a>
+      <a class="btn" href="#calendar">What’s coming up</a>
+      <a class="btn" href="#email-list">Join the mailing list</a>
+      <a class="btn" href="#about">Full bio</a>
+    </div>
+
+  </div>
+</div>
+</section>
+<section id="about">
+  <div class="container split">
+    <div>
+      <h2>About DeanoUno</h2>
+      <p>
+        DeanoUno is the solo performance side of what I do. I’ve been playing and singing professionally for a long time,
+        including years touring as part of the iconic lounge duo, DUSK, performing hundreds of shows each year.
+      </p>
+    
+      <p> After the passing of my beloved wife and singing partner, Kathleen, when I’m not with Marvilla, it’s just me at the piano—pulling from a wide range of music: classic pop, rock, country, jazz,
+        and singer-songwriter stuff that people connect with.
+       </p>
+     
+      <p>
+       My goal is simple: play great songs, keep things relaxed, and make the night feel like something you’re part of,
+        not just watching.
+      </p>
+    
+    <p>When you come, make sure you stop and say hello. Request a song if you like....you can even scan my custom QR code with your phone and choose a song from an extensive repertoire </p>
+    </div>
+    <div>
+      <!-- PHOTO SLOT: 
+           Use a natural performance shot
+           You at the piano, mid-distance
+           Ideally with people in the room (slightly blurred is fine)
+           This should feel like “this is what it’s like to be there” -->
+    <div class="about-photo">
+      <img src="assets/images/about/deanouno-about2.jpg" alt="DeanoUno performing live">
+    </div>
+  </div>
+</section>
+  <section id="gallery">
+    <div class="container">
+      <h2>In the room</h2>
+      <p>
+        A few moments from the night.
+      </p>
+
+      <div class="gallery-grid">
+        <img src="assets/images/gallery/dance-floor2.jpg">
+        <img src="assets/images/gallery/crowd-energy.jpg">
+        <img src="assets/images/gallery/live-performance-1.jpg">
+        <img src="assets/images/gallery/live-performance-2.jpg">
+        <img src="assets/images/gallery/intimate-moment.jpg">
+      </div>
+    </div>
+  </section>
+<section id="calendar">
+  <div class="container split">
+    <div>
+      <h2>Where to find me</h2>
+      <p>
+        This is always up to date, so if you’re heading out and wondering where I’m playing, check here first.
+      </p>
+    </div>
+    <div>
+      <div class="calendar-item">
+        <span>Tonight</span>
+        <span>Bellini’s · 6–9:30</span>
+      </div>
+      <div class="calendar-item">
+        <span>Friday</span>
+        <span>Moose Lodge · 7–10</span>
+      </div>
+      <div class="calendar-item">
+        <span>Saturday</span>
+        <span>Private Event</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Stay in the loop</h2>
+    <p>
+      I send out a simple weekly update with where I’ll be playing. That’s it.
+    </p>
+
+    <div class="email-box">
+      <input type="text" placeholder="First name">
+      <input type="email" placeholder="Email address">
+      <a class="btn" href="#">Get the schedule</a>
+    </div>
+  </div>
+</section>
+
+<section id="booking">
+  <div class="container split">
+    <div>
+      <h2>Booking</h2>
+      <p>
+        If you’re connected to a venue, event, or room and think this would be a good fit, feel free to reach out.
+      </p>
+    </div>
+    <div>
+      <input type="text" placeholder="Name">
+      <input type="email" placeholder="Email">
+      <input type="text" placeholder="Venue">
+      <input type="text" placeholder="Date">
+      <input type="text" placeholder="Message">
+      <a class="btn" href="#">Send</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    DeanoUno · Southwest Florida
+  </div>
+</footer>
+
+</body>
+</html>
