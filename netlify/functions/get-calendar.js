@@ -16,36 +16,36 @@ exports.handler = async function () {
 
     const data = await ical.async.fromURL(feedUrl);
 
-    const now = new Date();
 
-    const events = Object.values(data)
-      .filter((item) => item && item.type === "VEVENT" && item.start)
-      .map((event) => {
-        const start = new Date(event.start);
-        const end = event.end ? new Date(event.end) : null;
+        const now = new Date();
 
-        return {
-          title: event.summary || "Untitled event",
-          description: event.description || "",
-          location: event.location || "",
-          start: start.toISOString(),
-          end: end ? end.toISOString() : null,
-          dateText: start.toLocaleDateString("en-US", {
-            weekday: "short",
-            month: "short",
-            day: "numeric"
-          }),
-          timeText: start.toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit"
-          })
-        };
-      })
-      .filter((event) => new Date(event.start) >= new Date())
-      .sort((a, b) => new Date(a.start) - new Date(b.start))
-      .slice(0, 12);
+        const events = Object.values(data)
+        .filter((item) => item && item.type === "VEVENT" && item.start)
+        .map((event) => {
+            const start = new Date(event.start);
+            const end = event.end ? new Date(event.end) : null;
 
-    return {
+            return {
+            title: event.summary || "Untitled event",
+            description: event.description || "",
+            location: event.location || "",
+            start: start.toISOString(),
+            end: end ? end.toISOString() : null,
+            dateText: start.toLocaleDateString("en-US", {
+                weekday: "short",
+                month: "short",
+                day: "numeric"
+            }),
+            timeText: start.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit"
+            })
+            };
+        })
+        // ✅ TEMP: REMOVE FILTER COMPLETELY
+        // .filter(...)
+        .sort((a, b) => new Date(a.start) - new Date(b.start))
+        .slice(0, 12);    return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
