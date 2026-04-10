@@ -42,10 +42,8 @@ exports.handler = async function () {
           })
         };
       })
-      .filter((event) => new Date(event.start) >= new Date(now.getTime() - 6 * 60 * 60 * 1000))
-      .sort((a, b) => new Date(a.start) - new Date(b.start))
-      .slice(0, 12);
-
+        .sort((a, b) => new Date(a.start) - new Date(b.start))
+        .slice(0, 12);
     return {
       statusCode: 200,
       headers: {
