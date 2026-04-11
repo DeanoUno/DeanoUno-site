@@ -7,7 +7,8 @@ exports.handler = async function () {
     if (!feedUrl) {
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: "Missing WTG_ICAL_URL" })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Missing WTG_ICAL_URL" }, null, 2)
       };
     }
 
@@ -19,57 +20,63 @@ exports.handler = async function () {
 
     let rawText = await response.text();
 
-    // 🔥 FIX: unfold ICS lines (this is the key)
+    // Unfold folded ICS lines
     rawText = rawText.replace(/\r?\n[ \t]/g, "");
 
     const parsed = ical.parseICS(rawText);
+    const items = Object.values(parsed);
+
+    const vevents = items.filter(
+      (item) => item && item.type === "VEVENT" && item.start
+    );
+
+    const mapped = vevents.map((event) => {
+      const start = new Date(event.start);
+      return {
+        title: event.summary || "",
+        rawStart: String(event.start),
+        isoStart: isNaN(start.getTime()) ? "INVALID" : start.toISOString(),
+        ms: isNaN(start.getTime()) ? null : start.getTime(),
+        location: event.location || ""
+      };
+    });
+
     const now = Date.now();
 
-    const events = Object.values(parsed)
-      .filter((item) => item && item.type === "VEVENT" && item.start)
-      .map((event) => {
-        const start = new Date(event.start);
-        const end = event.end ? new Date(event.end) : null;
-
-        return {
-          title: event.summary || "Untitled event",
-          location: event.location || "",
-          description: event.description || "",
-          start: start.toISOString(),
-          end: end ? end.toISOString() : null,
-          startMs: start.getTime(),
-          dateText: start.toLocaleDateString("en-US", {
-            weekday: "short",
-            month: "short",
-            day: "numeric",
-            timeZone: "America/New_York"
-          }),
-          timeText: start.toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            timeZone: "America/New_York"
-          })
-        };
-      })
-      .filter((event) => event.startMs >= now)
-      .sort((a, b) => a.startMs - b.startMs)
-      .slice(0, 12)
-      .map(({ startMs, ...event }) => event);
+    const future = mapped.filter((e) => e.ms && e.ms >= now);
 
     return {
       statusCode: 200,
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store"
       },
-      body: JSON.stringify({ events }, null, 2)
+      body: JSON.stringify(
+        {
+          now: new Date(now).toISOString(),
+          totalParsedItems: items.length,
+          veventCount: vevents.length,
+          futureCount: future.length,
+          first5: mapped.slice(0, 5),
+          last5: mapped.slice(-5),
+          first5Future: future.slice(0, 5)
+        },
+        null,
+        2
+      )
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: "Calendar parsing failed",
-        details: error.message
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        {
+          error: "Calendar parsing failed",
+          details: error.message
+        },
+        null,
+        2
+      )
     };
   }
 };
