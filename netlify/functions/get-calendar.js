@@ -7,70 +7,73 @@ exports.handler = async function () {
     if (!feedUrl) {
       return {
         statusCode: 500,
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           error: "Missing WTG_ICAL_URL environment variable."
-        })
+        }, null, 2)
       };
     }
 
     const data = await ical.async.fromURL(feedUrl);
-
     const now = Date.now();
 
-    const events = Object.values(data)
-      .filter((item) => item && item.type === "VEVENT" && item.start)
-      .map((event) => {
-        const start = new Date(event.start);
-        const end = event.end ? new Date(event.end) : null;
+    const allItems = Object.values(data);
 
-        return {
-          title: event.summary || "Untitled event",
-          description: event.description || "",
-          location: event.location || "",
-          start: start.toISOString(),
-          end: end ? end.toISOString() : null,
-          startMs: start.getTime(),
-          dateText: start.toLocaleDateString("en-US", {
-            weekday: "short",
-            month: "short",
-            day: "numeric",
-            timeZone: "America/New_York"
-          }),
-          timeText: start.toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            timeZone: "America/New_York"
-          })
-        };
-      })
-      .filter((event) => event.startMs >= now)
-      .sort((a, b) => a.startMs - b.startMs)
-      .slice(0, 12)
-      .map(({ startMs, ...event }) => event);
+    const vevents = allItems.filter(
+      (item) => item && item.type === "VEVENT" && item.start
+    );
+
+    const mapped = vevents.map((event) => {
+      const start = new Date(event.start);
+      const end = event.end ? new Date(event.end) : null;
+
+      return {
+        title: event.summary || "Untitled event",
+        location: event.location || "",
+        rawStart: event.start,
+        rawEnd: event.end || null,
+        startIso: isNaN(start.getTime()) ? "INVALID DATE" : start.toISOString(),
+        endIso: end && !isNaN(end.getTime()) ? end.toISOString() : null,
+        startMs: start.getTime()
+      };
+    });
+
+    const future = mapped.filter((event) => event.startMs >= now);
 
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=300"
+        "Cache-Control": "no-store"
       },
-      body: JSON.stringify({ events })
+      body: JSON.stringify(
+        {
+          nowIso: new Date(now).toISOString(),
+          totalItems: allItems.length,
+          veventCount: vevents.length,
+          mappedCount: mapped.length,
+          futureCount: future.length,
+          firstFiveMapped: mapped.slice(0, 5),
+          firstFiveFuture: future.slice(0, 5),
+          lastFiveMapped: mapped.slice(-5)
+        },
+        null,
+        2
+      )
     };
   } catch (error) {
-    console.error("Calendar fetch error:", error);
-
     return {
       statusCode: 500,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        error: "Failed to fetch calendar.",
-        details: error.message
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        {
+          error: "Failed to fetch calendar.",
+          details: error.message,
+          stack: error.stack
+        },
+        null,
+        2
+      )
     };
   }
 };
