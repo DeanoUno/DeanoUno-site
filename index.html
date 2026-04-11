@@ -7,6 +7,7 @@
   <style>
     :root {
       --bg: #ffffff;
+      --cream: #f7f3ee;
       --ink: #1a1a1a;
       --muted: #6b6b6b;
       --line: rgba(0,0,0,0.08);
@@ -15,12 +16,21 @@
     }
 
     * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background: var(--bg);
       color: var(--ink);
       line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
     }
 
     .container {
@@ -31,12 +41,14 @@
     header {
       padding: 1.5rem 0;
       border-bottom: 1px solid var(--line);
+      background: #fff;
     }
 
     .header-inner {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 1rem;
     }
 
     .brand {
@@ -50,6 +62,15 @@
       gap: 1.5rem;
       font-size: 0.95rem;
       color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      text-decoration: none;
+    }
+
+    nav a:hover {
+      color: var(--ink);
     }
 
     section {
@@ -80,22 +101,24 @@
         url('assets/images/hero/deanouno-hero.jpeg') center 18% / cover no-repeat;
       color: white;
     }
-    .hero-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 0.9rem;
-      max-width: 320px;
-      margin: 0 auto;
-    }    
 
     .hero-inner {
       text-align: center;
       max-width: 700px;
       margin: 0 auto;
     }
+
     .hero p {
       margin-top: 1.5rem;
       color: rgba(255,255,255,0.9);
+    }
+
+    .hero-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      max-width: 320px;
+      margin: 0 auto;
     }
 
     .btn {
@@ -109,7 +132,14 @@
       font-weight: 600;
       text-align: center;
       margin-top: 0;
+      transition: transform 0.15s ease, opacity 0.15s ease;
     }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
     .split {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -131,12 +161,12 @@
       border-radius: 12px;
     }
 
-
     .calendar-item {
       padding: 1rem 0;
       border-bottom: 1px solid var(--line);
       display: flex;
       justify-content: space-between;
+      gap: 1rem;
     }
 
     .email-box {
@@ -150,6 +180,8 @@
       width: 100%;
       margin-top: 0.5rem;
       border: 1px solid var(--line);
+      border-radius: 10px;
+      font: inherit;
     }
 
     footer {
@@ -158,6 +190,7 @@
       color: var(--muted);
       font-size: 0.9rem;
     }
+
     .about-photo img {
       width: 100%;
       max-width: 420px;
@@ -165,13 +198,160 @@
       display: block;
       margin: 0 auto;
       border-radius: 12px;
-    }    
+    }
+
+    /* ===== EVENTS SECTION ===== */
+
+    .events-section {
+      padding: 5rem 1.5rem;
+      background: var(--cream);
+    }
+
+    .events-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .events-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .events-kicker {
+      display: inline-block;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #8a6a2f;
+      margin-bottom: 0.75rem;
+    }
+
+    .events-header h2 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
+    }
+
+    .events-header p {
+      max-width: 700px;
+      margin: 0.85rem auto 0;
+      color: #5f5a55;
+      font-size: 1.02rem;
+      line-height: 1.7;
+    }
+
+    .events-status {
+      text-align: center;
+      color: #6a625b;
+      font-size: 0.98rem;
+      margin: 1rem 0 2rem;
+    }
+
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .event-card {
+      background: #ffffff;
+      border: 1px solid rgba(31, 26, 23, 0.08);
+      border-radius: 20px;
+      padding: 1.15rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .event-logo-box {
+      width: 92px;
+      height: 92px;
+      border-radius: 16px;
+      background: #1f1a17;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 0.6rem;
+    }
+
+    .event-logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .event-logo-fallback {
+      color: #fff;
+      font-size: 0.78rem;
+      line-height: 1.2;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .event-main h3 {
+      margin: 0 0 0.35rem;
+      font-size: 1.1rem;
+      line-height: 1.3;
+    }
+
+    .event-date {
+      margin: 0 0 0.2rem;
+      color: #1f1a17;
+      font-weight: 600;
+      font-size: 0.96rem;
+    }
+
+    .event-meta {
+      margin: 0 0 0.35rem;
+      color: #8a6a2f;
+      font-weight: 600;
+      font-size: 0.97rem;
+    }
+
+    .event-location {
+      margin: 0;
+      color: #5f5a55;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 820px) {
+      .events-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .event-card {
+        grid-template-columns: 78px 1fr;
+      }
+
+      .event-logo-box {
+        width: 78px;
+        height: 78px;
+      }
+    }
+
     @media (max-width: 800px) {
       .gallery-grid {
-    grid-template-columns: 1fr;
-  }
+        grid-template-columns: 1fr;
+      }
+
       .split {
         grid-template-columns: 1fr;
+      }
+
+      .header-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .calendar-item {
+        flex-direction: column;
       }
     }
   </style>
@@ -191,28 +371,27 @@
 
 <section class="hero">
   <div class="container">
-  <div class="hero-inner">
-      <!-- LOGO -->
-      <!-- Replace with your actual logo file -->
-    <img src="assets/logos/deano-logo.png" 
+    <div class="hero-inner">
+      <img
+        src="assets/logos/deano-logo.png"
         alt="DeanoUno logo"
-        style="max-width:220px; margin:0 auto 1.75rem; display:block;">
-      <!-- SIMPLE MESSAGE -->
+        style="max-width:220px; margin:0 auto 1.75rem; display:block;"
+      >
+
       <p style="margin:0 auto 2rem; max-width:500px; font-size:1.1rem; color:rgba(255,255,255,0.95);">
         Thanks for stopping by.
       </p>
 
-    <!-- MAIN ACTION BUTTONS -->
-    <div class="hero-buttons">
-      <a class="btn" href="#calendar">Where am I tonight?</a>
-      <a class="btn" href="#calendar">What’s coming up</a>
-      <a class="btn" href="#email-list">Join the mailing list</a>
-      <a class="btn" href="#about">Full bio</a>
+      <div class="hero-buttons">
+        <a class="btn" href="#calendar">Where am I tonight?</a>
+        <a class="btn" href="#calendar">What’s coming up</a>
+        <a class="btn" href="#email-list">Join the mailing list</a>
+        <a class="btn" href="#about">Full bio</a>
+      </div>
     </div>
-
   </div>
-</div>
 </section>
+
 <section id="about">
   <div class="container split">
     <div>
@@ -221,71 +400,64 @@
         DeanoUno is the solo performance side of what I do. I’ve been playing and singing professionally for a long time,
         including years touring as part of the iconic lounge duo, DUSK, performing hundreds of shows each year.
       </p>
-    
-      <p> After the passing of my beloved wife and singing partner, Kathleen, when I’m not with Marvilla, it’s just me at the piano—pulling from a wide range of music: classic pop, rock, country, jazz,
-        and singer-songwriter stuff that people connect with.
-       </p>
-     
+
       <p>
-       My goal is simple: play great songs, keep things relaxed, and make the night feel like something you’re part of,
+        After the passing of my beloved wife and singing partner, Kathleen, when I’m not with Marvilla, it’s just me at the piano—pulling from a wide range of music: classic pop, rock, country, jazz,
+        and singer-songwriter stuff that people connect with.
+      </p>
+
+      <p>
+        My goal is simple: play great songs, keep things relaxed, and make the night feel like something you’re part of,
         not just watching.
       </p>
-    
-    <p>When you come, make sure you stop and say hello. Request a song if you like....you can even scan my custom QR code with your phone and choose a song from an extensive repertoire </p>
-    </div>
-    <div>
-      <!-- PHOTO SLOT: 
-           Use a natural performance shot
-           You at the piano, mid-distance
-           Ideally with people in the room (slightly blurred is fine)
-           This should feel like “this is what it’s like to be there” -->
-    <div class="about-photo">
-      <img src="assets/images/about/deanouno-about2.jpg" alt="DeanoUno performing live">
-    </div>
-  </div>
-</section>
-  <section id="gallery">
-    <div class="container">
-      <h2>In the room</h2>
-      <p>
-        A few moments from the night.
-      </p>
 
-      <div class="gallery-grid">
-        <img src="assets/images/gallery/dance-floor2.jpg">
-        <img src="assets/images/gallery/crowd-energy.jpg">
-        <img src="assets/images/gallery/live-performance-1.jpg">
-        <img src="assets/images/gallery/live-performance-2.jpg">
-        <img src="assets/images/gallery/intimate-moment.jpg">
-      </div>
-    </div>
-  </section>
-<section id="calendar">
-  <div class="container split">
-    <div>
-      <h2>Where to find me</h2>
       <p>
-        This is always up to date, so if you’re heading out and wondering where I’m playing, check here first.
+        When you come, make sure you stop and say hello. Request a song if you like....you can even scan my custom QR code with your phone and choose a song from an extensive repertoire.
       </p>
     </div>
+
     <div>
-      <div class="calendar-item">
-        <span>Tonight</span>
-        <span>Bellini’s · 6–9:30</span>
-      </div>
-      <div class="calendar-item">
-        <span>Friday</span>
-        <span>Moose Lodge · 7–10</span>
-      </div>
-      <div class="calendar-item">
-        <span>Saturday</span>
-        <span>Private Event</span>
+      <div class="about-photo">
+        <img src="assets/images/about/deanouno-about2.jpg" alt="DeanoUno performing live">
       </div>
     </div>
   </div>
 </section>
 
-<section>
+<section id="gallery">
+  <div class="container">
+    <h2>In the room</h2>
+    <p>
+      A few moments from the night.
+    </p>
+
+    <div class="gallery-grid">
+      <img src="assets/images/gallery/dance-floor2.jpg" alt="Dance floor">
+      <img src="assets/images/gallery/crowd-energy.jpg" alt="Crowd energy">
+      <img src="assets/images/gallery/live-performance-1.jpg" alt="Live performance 1">
+      <img src="assets/images/gallery/live-performance-2.jpg" alt="Live performance 2">
+      <img src="assets/images/gallery/intimate-moment.jpg" alt="Intimate moment">
+    </div>
+  </div>
+</section>
+
+
+<section class="events-section">
+  <div class="events-wrap">
+    <div class="events-header">
+      <span class="events-kicker">Live Music</span>
+      <h2>Upcoming Shows</h2>
+      <p>
+        Here’s where you can catch me live around Southwest Florida.
+      </p>
+    </div>
+
+    <div id="eventsStatus" class="events-status">Loading events...</div>
+    <div id="eventsGrid" class="events-grid"></div>
+  </div>
+</section>
+
+<section id="email-list">
   <div class="container">
     <h2>Stay in the loop</h2>
     <p>
@@ -325,5 +497,100 @@
   </div>
 </footer>
 
+<script>
+  function getVenueName(event) {
+    return event.venue || event.title || 'Live Music';
+  }
+
+  function getShortLocation(event) {
+    return event.location || '';
+  }
+
+  function getVenueLogo(event) {
+    if (event.logoUrl) return event.logoUrl;
+
+    const name = `${event.venue || event.title || ''}`.toLowerCase();
+
+    const venueLogoMap = [
+      { match: 'bellini', logo: 'assets/images/venues/bellinis.png' },
+      { match: 'moose', logo: 'assets/images/venues/moose-lodge.png' },
+      { match: 'tunaskin', logo: 'assets/images/venues/tunaskin.png' },
+      { match: 'diamondhead', logo: 'assets/images/venues/dmhd.png' },
+      { match: 'verandah', logo: 'assets/images/venues/verandah.png'}
+    ]; 
+ 
+    const found = venueLogoMap.find(v => name.includes(v.match));
+    return found ? found.logo : '';
+  }
+
+  function getFallbackInitials(name) {
+    return name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0].toUpperCase())
+      .join('');
+  }
+
+  async function loadEvents() {
+    const statusEl = document.getElementById('eventsStatus');
+    const gridEl = document.getElementById('eventsGrid');
+
+    if (!statusEl || !gridEl) return;
+
+    try {
+      const response = await fetch('/.netlify/functions/get-calendar');
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload?.error || 'Failed to load calendar.');
+      }
+
+      const events = Array.isArray(payload?.events) ? payload.events : [];
+
+      if (!events.length) {
+        statusEl.textContent = 'No upcoming events found right now.';
+        gridEl.innerHTML = '';
+        return;
+      }
+
+      statusEl.textContent = '';
+      gridEl.innerHTML = '';
+
+      for (const event of events) {
+        const venueName = getVenueName(event);
+        const dateText = event.dateText || '';
+        const timeText = event.timeText || '';
+        const shortLocation = getShortLocation(event);
+        const logoUrl = getVenueLogo(event);
+
+        const card = document.createElement('article');
+        card.className = 'event-card';
+
+        const logoMarkup = logoUrl
+          ? `<div class="event-logo-box"><img src="${logoUrl}" alt="${venueName} logo"></div>`
+          : `<div class="event-logo-box"><div class="event-logo-fallback">${getFallbackInitials(venueName)}</div></div>`;
+
+        card.innerHTML = `
+          ${logoMarkup}
+          <div class="event-main">
+            <h3>${venueName}</h3>
+            ${dateText ? `<p class="event-date">${dateText}</p>` : ''}
+            ${timeText ? `<p class="event-meta">${timeText}</p>` : ''}
+            ${shortLocation ? `<p class="event-location">${shortLocation}</p>` : ''}
+          </div>
+        `;
+
+        gridEl.appendChild(card);
+      }
+    } catch (error) {
+      console.error('Calendar load failed:', error);
+      statusEl.textContent = 'Unable to load events right now.';
+      gridEl.innerHTML = '';
+    }
+  }
+
+  loadEvents();
+</script>
 </body>
 </html>
