@@ -14,66 +14,76 @@ exports.handler = async function () {
       };
     }
 
-    const data = await ical.async.fromURL(feedUrl);
-    const now = Date.now();
-
-    const allItems = Object.values(data);
-
-    const vevents = allItems.filter(
-      (item) => item && item.type === "VEVENT" && item.start
-    );
-
-    const mapped = vevents.map((event) => {
-      const start = new Date(event.start);
-      const end = event.end ? new Date(event.end) : null;
-
-      return {
-        title: event.summary || "Untitled event",
-        location: event.location || "",
-        rawStart: event.start,
-        rawEnd: event.end || null,
-        startIso: isNaN(start.getTime()) ? "INVALID DATE" : start.toISOString(),
-        endIso: end && !isNaN(end.getTime()) ? end.toISOString() : null,
-        startMs: start.getTime()
-      };
+    const response = await fetch(feedUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 Netlify Function Calendar Fetch"
+      }
     });
 
-    const future = mapped.filter((event) => event.startMs >= now);
+    if (!response.ok) {
+      return {
+        statusCode: 500,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          error: "Failed to fetch feed URL.",
+          status: response.status,
+          statusText: response.statusText
+        }, null, 2)
+      };
+    }
+
+    const rawText = await response.text();
+
+    const parsed = ical.parseICS(rawText);
+    const now = Date.now();
+
+    const events = Object.values(parsed)
+      .filter((item) => item && item.type === "VEVENT" && item.start)
+      .map((event) => {
+        const start = new Date(event.start);
+        const end = event.end ? new Date(event.end) : null;
+
+        return {
+          title: event.summary || "Untitled event",
+          description: event.description || "",
+          location: event.location || "",
+          start: start.toISOString(),
+          end: end ? end.toISOString() : null,
+          startMs: start.getTime(),
+          dateText: start.toLocaleDateString("en-US", {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+            timeZone: "America/New_York"
+          }),
+          timeText: start.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            timeZone: "America/New_York"
+          })
+        };
+      })
+      .filter((event) => event.startMs >= now)
+      .sort((a, b) => a.startMs - b.startMs)
+      .slice(0, 12)
+      .map(({ startMs, ...event }) => event);
 
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "no-store"
+        "Cache-Control": "public, max-age=300"
       },
-      body: JSON.stringify(
-        {
-          nowIso: new Date(now).toISOString(),
-          totalItems: allItems.length,
-          veventCount: vevents.length,
-          mappedCount: mapped.length,
-          futureCount: future.length,
-          firstFiveMapped: mapped.slice(0, 5),
-          firstFiveFuture: future.slice(0, 5),
-          lastFiveMapped: mapped.slice(-5)
-        },
-        null,
-        2
-      )
+      body: JSON.stringify({ events }, null, 2)
     };
   } catch (error) {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(
-        {
-          error: "Failed to fetch calendar.",
-          details: error.message,
-          stack: error.stack
-        },
-        null,
-        2
-      )
+      body: JSON.stringify({
+        error: "Calendar fetch failed.",
+        details: error.message
+      }, null, 2)
     };
   }
 };
