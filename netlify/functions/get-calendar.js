@@ -3,9 +3,6 @@ function unfoldICS(text) {
 }
 
 function parseICSTimestamp(value) {
-  // Handles forms like:
-  // 20250415T180000
-  // 20250415T180000Z
   const m = String(value).match(
     /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z)?$/
   );
@@ -18,8 +15,6 @@ function parseICSTimestamp(value) {
     return new Date(Date.UTC(+y, +mo - 1, +d, +h, +mi, +s));
   }
 
-  // Feed uses America/New_York local times.
-  // Build a Date in local server time, then use it consistently for sorting/filtering.
   return new Date(+y, +mo - 1, +d, +h, +mi, +s);
 }
 
@@ -57,7 +52,6 @@ function parseEventsFromICS(rawText) {
 
     const left = line.slice(0, colonIndex);
     const value = line.slice(colonIndex + 1);
-
     const propName = left.split(";")[0];
 
     if (propName === "SUMMARY") current.summary = unescapeICS(value);
@@ -113,10 +107,26 @@ exports.handler = async function () {
 
         if (!start) return null;
 
+        const rawDescription = event.description || "";
+        const linkMatch = rawDescription.match(/https:\/\/[^\s"]+/);
+        const link = linkMatch ? linkMatch[0] : null;
+
+        const title = (event.summary || "Untitled event")
+          .replace(": Club Gig (Confirmed)", "")
+          .replace(": Private Party (Confirmed)", "")
+          .replace(": Restaurant Gig (Confirmed)", "")
+          .trim();
+
+        const description = rawDescription
+          .replace(/<[^>]*>/g, "")
+          .split("\n\n")[0]
+          .trim();
+
         return {
-          title: event.summary || "Untitled event",
-          description: event.description || "",
+          title,
+          description,
           location: event.location || "",
+          link,
           start: start.toISOString(),
           end: end ? end.toISOString() : null,
           startMs: start.getTime(),
