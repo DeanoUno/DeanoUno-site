@@ -1,15 +1,19 @@
-    const ical = require("node-ical");
+const ical = require("node-ical");
 
-    exports.handler = async function () {
-      const feedUrl = process.env.WTG_ICAL_URL;
-      const data = await ical.async.fromURL(feedUrl);
+exports.handler = async function () {
+  try {
+    const feedUrl = process.env.WTG_ICAL_URL;
 
+    if (!feedUrl) {
       return {
-        statusCode: 200,
+        statusCode: 500,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data, null, 2)
+        body: JSON.stringify({
+          error: "Missing WTG_ICAL_URL environment variable."
+        })
       };
-    };
+    }
+
     const data = await ical.async.fromURL(feedUrl);
 
     const now = new Date();
@@ -40,7 +44,7 @@
           startMs: start.getTime()
         };
       })
-      //.filter((event) => event.startMs >= now.getTime())
+      .filter((event) => event.startMs >= now.getTime())
       .sort((a, b) => a.startMs - b.startMs)
       .slice(0, 12)
       .map(({ startMs, ...event }) => event);
