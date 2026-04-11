@@ -44,7 +44,7 @@ exports.handler = async function () {
           startMs: start.getTime()
         };
       })
-      .filter((event) => event.startMs >= now.getTime())
+      //.filter((event) => event.startMs >= now.getTime())
       .sort((a, b) => a.startMs - b.startMs)
       .slice(0, 12)
       .map(({ startMs, ...event }) => event);
