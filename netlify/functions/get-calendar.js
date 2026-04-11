@@ -1,16 +1,15 @@
-const ical = require("node-ical");
+    const ical = require("node-ical");
 
-exports.handler = async function () {
-  const feedUrl = process.env.WTG_ICAL_URL;
-  const data = await ical.async.fromURL(feedUrl);
+    exports.handler = async function () {
+      const feedUrl = process.env.WTG_ICAL_URL;
+      const data = await ical.async.fromURL(feedUrl);
 
-  return {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data, null, 2)
-  };
-};    }
-
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data, null, 2)
+      };
+    };
     const data = await ical.async.fromURL(feedUrl);
 
     const now = new Date();
