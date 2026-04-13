@@ -251,7 +251,6 @@ exports.handler = async function () {
       .filter(Boolean)
       .filter((event) => event.sortMs >= now)
       .sort((a, b) => a.sortMs - b.sortMs)
-      .slice(0, 12)
       .map(({ sortMs, ...event }) => event);
 
     return {
