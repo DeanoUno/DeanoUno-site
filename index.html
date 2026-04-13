@@ -514,9 +514,11 @@
     const venueLogoMap = [
       { match: 'bellini', logo: 'assets/images/venues/bellinis.png' },
       { match: 'moose', logo: 'assets/images/venues/moose-lodge.png' },
-      { match: 'tunaskin', logo: 'assets/images/venues/tunaskin.png' },
       { match: 'diamondhead', logo: 'assets/images/venues/dmhd.png' },
-      { match: 'verandah', logo: 'assets/images/venues/verandah.png'}
+      { match: 'verandah', logo: 'assets/images/venues/verandah.png'},
+      { match: 'colonial', logo: 'assets/images/venues/colonial.jpeg' },
+      { match: 'bonita bay', logo: 'assets/images/venues/bonita-bay.jpeg' },
+      { match: 'st charles', logo: 'assets/images/venues/st-charles.jpeg' }
     ]; 
  
     const found = venueLogoMap.find(v => name.includes(v.match));
@@ -568,7 +570,7 @@
         card.className = 'event-card';
 
         const logoMarkup = logoUrl
-          ? `<div class="event-logo-box"><img src="${logoUrl}" alt="${venueName} logo"></div>`
+          ? `<div class="event-logo-box"><img src="${logoUrl}" alt="${venueName} logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><div class="event-logo-fallback" style="display: none;">${getFallbackInitials(venueName)}</div></div>`
           : `<div class="event-logo-box"><div class="event-logo-fallback">${getFallbackInitials(venueName)}</div></div>`;
 
         card.innerHTML = `

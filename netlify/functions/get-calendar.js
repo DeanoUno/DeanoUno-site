@@ -65,8 +65,7 @@ function floatingTimeInZoneToUtcISOString(parts, timeZone = "America/New_York") 
     ).toISOString();
   }
 
-  // Start with a UTC guess using the wall-clock parts
-  const utcGuessMs = Date.UTC(
+  const wallClockMs = Date.UTC(
     parts.year,
     parts.month - 1,
     parts.day,
@@ -75,11 +74,16 @@ function floatingTimeInZoneToUtcISOString(parts, timeZone = "America/New_York") 
     parts.second
   );
 
-  // Get the real offset for the target timezone at that date
-  const offsetMinutes = getOffsetMinutesForTimeZone(new Date(utcGuessMs), timeZone);
+  let offsetMinutes = getOffsetMinutesForTimeZone(new Date(wallClockMs), timeZone);
+  let realUtcMs = wallClockMs - offsetMinutes * 60 * 1000;
 
-  // Convert the wall-clock time in that timezone into the correct UTC instant
-  const realUtcMs = utcGuessMs - offsetMinutes * 60 * 1000;
+  for (let i = 0; i < 3; i++) {
+    const actualOffsetMinutes = getOffsetMinutesForTimeZone(new Date(realUtcMs), timeZone);
+    if (actualOffsetMinutes === offsetMinutes) break;
+
+    offsetMinutes = actualOffsetMinutes;
+    realUtcMs = wallClockMs - offsetMinutes * 60 * 1000;
+  }
 
   return new Date(realUtcMs).toISOString();
 }
