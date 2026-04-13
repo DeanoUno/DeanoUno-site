@@ -223,7 +223,7 @@ exports.handler = async function () {
 
         const rawDescription = event.description || "";
         const sourceText = `${event.summary || ""}\n${rawDescription}`;
-        const companionNote = /\bMarvilla\s+Marzan\b/i.test(sourceText)
+        const companionNote = /\bMarvilla\b/i.test(sourceText)
           ? "With Marvilla Marzan"
           : null;
         const linkMatch = rawDescription.match(/https:\/\/[^\s"]+/);
