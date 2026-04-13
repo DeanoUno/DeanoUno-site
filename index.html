@@ -324,6 +324,14 @@
       font-size: 0.95rem;
     }
 
+    .event-note,
+    .schedule-note {
+      margin: 0.35rem 0 0;
+      color: #8a6a2f;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
     .schedule-list {
       margin-top: 2rem;
       border-top: 1px solid var(--line);
@@ -354,6 +362,45 @@
     .schedule-venue {
       margin: 0;
       color: var(--ink);
+      font-weight: 700;
+    }
+
+    .schedule-location-button {
+      display: inline;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+      cursor: pointer;
+    }
+
+    .schedule-location-button:hover,
+    .schedule-location-button:focus {
+      color: var(--ink);
+    }
+
+    .schedule-map-panel {
+      margin-top: 0.75rem;
+      max-width: 420px;
+    }
+
+    .schedule-map-panel iframe {
+      display: block;
+      width: 100%;
+      height: 180px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .schedule-map-link {
+      display: inline-block;
+      margin-top: 0.35rem;
+      color: var(--accent);
+      font-size: 0.9rem;
       font-weight: 700;
     }
 
@@ -555,6 +602,17 @@
 </footer>
 
 <script>
+  let scheduleMapPanelId = 0;
+
+  function escapeHTML(value) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function getVenueName(event) {
     return event.venue || event.title || 'Live Music';
   }
@@ -591,6 +649,52 @@
       .join('');
   }
 
+  function isUsableMapLocation(location) {
+    const value = String(location || '').trim();
+
+    if (!value || /^(tbd|to be determined|private|online|virtual)$/i.test(value)) {
+      return false;
+    }
+
+    return /\d+.+,\s*[^,]+,\s*[A-Z]{2}\b/.test(value) || /,\s*[^,]+,\s*[A-Z]{2}\b/.test(value);
+  }
+
+  function getScheduleLocationMarkup(location) {
+    if (!location) return '';
+
+    const safeLocation = escapeHTML(location);
+
+    if (!isUsableMapLocation(location)) {
+      return `<p class="schedule-location">${safeLocation}</p>`;
+    }
+
+    const mapPanelId = `schedule-map-${scheduleMapPanelId++}`;
+    const encodedLocation = encodeURIComponent(location);
+    const embedUrl = `https://www.google.com/maps?q=${encodedLocation}&output=embed`;
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedLocation}`;
+
+    return `
+      <p class="schedule-location">
+        <button class="schedule-location-button" type="button" aria-expanded="false" aria-controls="${mapPanelId}" onclick="toggleVenueMap(this)">
+          ${safeLocation}
+        </button>
+      </p>
+      <div id="${mapPanelId}" class="schedule-map-panel" hidden>
+        <iframe src="${embedUrl}" title="Map preview for ${safeLocation}" loading="lazy"></iframe>
+        <a class="schedule-map-link" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+      </div>
+    `;
+  }
+
+  function toggleVenueMap(button) {
+    const panel = button.closest('.schedule-location')?.nextElementSibling;
+    if (!panel) return;
+
+    const isOpen = !panel.hidden;
+    panel.hidden = isOpen;
+    button.setAttribute('aria-expanded', String(!isOpen));
+  }
+
   function createEventCard(event) {
     const venueName = getVenueName(event);
     const dateText = event.dateText || '';
@@ -612,6 +716,7 @@
         ${dateText ? `<p class="event-date">${dateText}</p>` : ''}
         ${timeText ? `<p class="event-meta">${timeText}</p>` : ''}
         ${shortLocation ? `<p class="event-location">${shortLocation}</p>` : ''}
+        ${event.companionNote ? '<p class="event-note">With <a href="https://www.marvillamarzan.com/" target="_blank" rel="noopener noreferrer">Marvilla Marzan</a></p>' : ''}
       </div>
     `;
 
@@ -633,7 +738,8 @@
       </div>
       <div>
         <p class="schedule-venue">${venueName}</p>
-        ${shortLocation ? `<p class="schedule-location">${shortLocation}</p>` : ''}
+        ${getScheduleLocationMarkup(shortLocation)}
+        ${event.companionNote ? '<p class="schedule-note">With <a href="https://www.marvillamarzan.com/" target="_blank" rel="noopener noreferrer">Marvilla Marzan</a></p>' : ''}
       </div>
     `;
 

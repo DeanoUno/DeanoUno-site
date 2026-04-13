@@ -222,6 +222,10 @@ exports.handler = async function () {
         if (Number.isNaN(startMs)) return null;
 
         const rawDescription = event.description || "";
+        const sourceText = `${event.summary || ""}\n${rawDescription}`;
+        const companionNote = /\bMarvilla\s+Marzan\b/i.test(sourceText)
+          ? "With Marvilla Marzan"
+          : null;
         const linkMatch = rawDescription.match(/https:\/\/[^\s"]+/);
         const link = linkMatch ? linkMatch[0] : null;
 
@@ -241,6 +245,7 @@ exports.handler = async function () {
           description,
           location: event.location || "",
           link,
+          companionNote,
           start: startISO,
           end: endISO,
           dateText: formatEventDateText(startISO, eventTimeZone),
