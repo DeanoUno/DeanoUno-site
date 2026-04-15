@@ -58,6 +58,7 @@
       left: 0;
       top: 50%;
       transform: translateY(-50%);
+      z-index: 1003;
     }
 
     .menu-toggle {
@@ -905,56 +906,63 @@
     });
   }
 
-    function setupMenu() {
-      const menuWrap = document.getElementById('menuWrap');
-      const menuToggle = document.getElementById('menuToggle');
-      const siteMenu = document.getElementById('siteMenu');
+function setupMenu() {
+  const menuWrap = document.getElementById('menuWrap');
+  const menuToggle = document.getElementById('menuToggle');
+  const siteMenu = document.getElementById('siteMenu');
 
-      if (!menuWrap || !menuToggle || !siteMenu) return;
+  if (!menuWrap || !menuToggle || !siteMenu) return;
 
-      function openMenu() {
-        siteMenu.hidden = false;
-        menuToggle.setAttribute('aria-expanded', 'true');
-      }
+  let closeTimer;
 
-      function closeMenu() {
-        siteMenu.hidden = true;
-        menuToggle.setAttribute('aria-expanded', 'false');
-      }
+  function openMenu() {
+    clearTimeout(closeTimer);
+    siteMenu.hidden = false;
+    menuToggle.setAttribute('aria-expanded', 'true');
+  }
 
-      function toggleMenu(event) {
-        event.stopPropagation();
-        if (siteMenu.hidden) {
-          openMenu();
-        } else {
-          closeMenu();
-        }
-      }
+  function closeMenu() {
+    clearTimeout(closeTimer);
+    siteMenu.hidden = true;
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
 
-      menuToggle.addEventListener('click', toggleMenu);
+  function scheduleClose() {
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(closeMenu, 150);
+  }
 
-      menuWrap.addEventListener('mouseleave', () => {
-        closeMenu();
-      });
-
-      siteMenu.querySelectorAll('a').forEach((link) => {
-        link.addEventListener('click', () => {
-          closeMenu();
-        });
-      });
-
-      document.addEventListener('click', (event) => {
-        if (!menuWrap.contains(event.target)) {
-          closeMenu();
-        }
-      });
-
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-          closeMenu();
-        }
-      });
+  menuToggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (siteMenu.hidden) {
+      openMenu();
+    } else {
+      closeMenu();
     }
+  });
+
+  menuWrap.addEventListener('mouseenter', openMenu);
+  menuWrap.addEventListener('mouseleave', scheduleClose);
+
+  siteMenu.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      closeMenu();
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!menuWrap.contains(event.target)) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeMenu();
+    }
+  });
+}  
+  
     setupMenu();
     loadEvents();
     setupMailingListForm();   
