@@ -45,16 +45,59 @@
     }
 
     .header-inner {
+      position: relative;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       gap: 1rem;
     }
 
+    .menu-toggle {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: none;
+      font-size: 2rem;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--ink);
+      padding: 0.25rem 0.5rem;
+    }
+
+    .menu-panel {
+      position: absolute;
+      top: calc(100% + 0.75rem);
+      left: 0;
+      min-width: 220px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+      padding: 0.75rem 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    .menu-panel a {
+      text-decoration: none;
+      color: var(--ink);
+      padding: 0.8rem 1rem;
+    }
+
+    .menu-panel a:hover {
+      background: var(--cream);
+    }
+
+    .hero-buttons {
+      display: none;
+    }
     .brand {
       font-weight: 700;
       letter-spacing: 0.08em;
-      text-transform: uppercase;
+      text-transform: none;
     }
 
     nav {
@@ -95,13 +138,16 @@
     }
 
     .hero {
-      padding: 10rem 0 8rem;
+      padding: 8rem 0 6rem;
       background:
-        linear-gradient(rgba(0,0,0,0.28), rgba(0,0,0,0.28)),
-        url('assets/images/hero/deanouno-hero.jpeg') center 18% / cover no-repeat;
+        linear-gradient(
+          rgba(0,0,0,0.55),
+          rgba(0,0,0,0.25) 40%,
+          rgba(0,0,0,0.55)
+        ),       
+      url('assets/images/hero/deanouno-hero.jpeg') center 10% / cover no-repeat;
       color: white;
     }
-
     .hero-inner {
       text-align: center;
       max-width: 700px;
@@ -454,41 +500,38 @@
 </head>
 <body>
 
-<header>
-  <div class="container header-inner">
-    <div class="brand">DeanoUno</div>
-    <nav>
-      <a href="#about">About</a>
-      <a href="#full-schedule">Schedule</a>
-      <a href="#booking">Booking</a>
-    </nav>
-  </div>
-</header>
+  <header>
+    <div class="container header-inner">
+      <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="siteMenu" aria-label="Open menu">
+        ☰
+      </button>
 
-<section class="hero">
-  <div class="container">
-    <div class="hero-inner">
-      <img
-        src="assets/logos/deano-logo.png"
-        alt="DeanoUno logo"
-        style="max-width:220px; margin:0 auto 1.75rem; display:block;"
-      >
+      <div class="brand">DeanoUno</div>
 
-      <p style="margin:0 auto 2rem; max-width:500px; font-size:1.1rem; color:rgba(255,255,255,0.95);">
-        Thanks for stopping by.
-      </p>
-
-      <div class="hero-buttons">
-        <a class="btn" href="#upcoming-shows">Next Shows</a>
-        <a class="btn" href="#full-schedule">Full Schedule</a>
-        <a class="btn" href="#email-list">Join the mailing list</a>
-        <a class="btn" href="#about">Full bio</a>
+      <div class="menu-panel" id="siteMenu" hidden>
+        <a href="#about">About</a>
+        <a href="#upcoming-shows">Next 3 Shows</a>
+        <a href="#full-schedule">Full Schedule</a>
+        <a href="#email-list">Mailing List</a>
+        <a href="#contact">Contact</a>
       </div>
     </div>
-  </div>
-</section>
-
-<section id="about">
+  </header>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-inner">
+          <img
+            src="assets/logos/deano-logo.png"
+            alt="DeanoUno logo"
+            style="max-width:520px; width:100%; margin:0 auto 1.75rem; display:block;"
+          >
+          <p style="margin:0 auto 2rem; max-width:500px; font-size:1.1rem; color:rgba(255,255,255,0.95);">
+            Thanks for stopping by.
+          </p>
+        </div>
+      </div>
+    </section>
+  <section id="about">
   <div class="container split">
     <div>
       <h2>About DeanoUno</h2>
@@ -528,11 +571,13 @@
     </p>
 
     <div class="gallery-grid">
-      <img src="assets/images/gallery/dance-floor2.jpg" alt="Dance floor">
-      <img src="assets/images/gallery/crowd-energy.jpg" alt="Crowd energy">
-      <img src="assets/images/gallery/live-performance-1.jpg" alt="Live performance 1">
-      <img src="assets/images/gallery/live-performance-2.jpg" alt="Live performance 2">
-      <img src="assets/images/gallery/intimate-moment.jpg" alt="Intimate moment">
+      <img src="assets/images/gallery/dance-floor2.jpg" alt="">
+      <img src="assets/images/gallery/crowd-energy.jpg" alt="">
+      <img src="assets/images/gallery/live-performance-1.jpg" alt="">
+      <img src="assets/images/gallery/live-performance-2.jpg" alt="">
+      <img src="assets/images/gallery/deano-2.jpg" alt="">
+     <img src="assets/images/gallery/deano-1.jpg" alt="">
+
     </div>
   </div>
 </section>
@@ -869,7 +914,7 @@
 
       const mailtoLink = `mailto:duskduo@gmail.com?subject=Booking Inquiry&body=${encodeURIComponent(body)}`;
 
-      window.location.href = mailtoLink;
+      window.open(mailtoLink);
 
       form.reset();
       statusEl.textContent = 'I youe email clieant does not open automatically, please email me direcrly';
