@@ -50,6 +50,7 @@
       justify-content: center;
       align-items: center;
       gap: 1rem;
+      min-height: 56px;
     }
 
     .menu-toggle {
@@ -64,6 +65,7 @@
       cursor: pointer;
       color: var(--ink);
       padding: 0.25rem 0.5rem;
+      z-index: 1002;
     }
 
     .menu-panel {
@@ -91,13 +93,12 @@
       background: var(--cream);
     }
 
-    .hero-buttons {
-      display: none;
-    }
+
     .brand {
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: none;
+      text-align: center;
     }
 
     nav {
@@ -144,10 +145,11 @@
           rgba(0,0,0,0.55),
           rgba(0,0,0,0.25) 40%,
           rgba(0,0,0,0.55)
-        ),       
+        ),
       url('assets/images/hero/deanouno-hero.jpeg') center 10% / cover no-repeat;
       color: white;
     }
+
     .hero-inner {
       text-align: center;
       max-width: 700px;
@@ -488,8 +490,22 @@
       }
 
       .header-inner {
-        align-items: flex-start;
-        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        flex-direction: row;
+        padding-left: 3.25rem;
+      }
+
+      .brand {
+        margin: 0;
+        text-align: left;
+      }
+
+      .menu-panel {
+        left: 0;
+        right: auto;
+        min-width: 240px;
+        max-width: calc(100vw - 2rem);
       }
 
       .calendar-item {
@@ -886,9 +902,57 @@
     });
   }
 
-  loadEvents();
-  setupMailingListForm();
-   
+  function setupMenu() {
+    const menuToggle = document.getElementById('menuToggle');
+    const siteMenu = document.getElementById('siteMenu');
+    const headerInner = document.querySelector('.header-inner');
+
+    if (!menuToggle || !siteMenu || !headerInner) return;
+
+    function openMenu() {
+      siteMenu.hidden = false;
+      menuToggle.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeMenu() {
+      siteMenu.hidden = true;
+      menuToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    menuToggle.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (siteMenu.hidden) {
+        openMenu();
+      } else {
+        closeMenu();
+      }
+    });
+
+    siteMenu.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+
+    headerInner.addEventListener('mouseleave', () => {
+      closeMenu();
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!headerInner.contains(event.target)) {
+        closeMenu();
+      }
+    });
+
+    siteMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        closeMenu();
+      });
+    });
+  }
+
+    setupMenu();
+    loadEvents();
+    setupMailingListForm();   
+  
   function setupContactForm() {
     const form = document.getElementById('contactForm');
     const statusEl = document.getElementById('contactStatus');
@@ -914,10 +978,9 @@
 
       const mailtoLink = `mailto:duskduo@gmail.com?subject=Booking Inquiry&body=${encodeURIComponent(body)}`;
 
-      window.open(mailtoLink);
-
+  window.location.href = mailtoLink;
       form.reset();
-      statusEl.textContent = 'I youe email clieant does not open automatically, please email me direcrly';
+      statusEl.textContent = 'If your email client does not open automatically, please email me directly';
       
       setTimeout(() => {
         statusEl.textContent = '';
