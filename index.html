@@ -175,6 +175,12 @@
       margin-top: 2rem;
     }
 
+    .email-box .btn {
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+    }
+
     input {
       padding: 0.8rem;
       width: 100%;
@@ -557,11 +563,12 @@
       I send out a simple weekly update with where I’ll be playing. That’s it.
     </p>
 
-    <div class="email-box">
-      <input type="text" placeholder="First name">
-      <input type="email" placeholder="Email address">
-      <a class="btn" href="#">Get the schedule</a>
-    </div>
+    <form class="email-box" id="mailingListForm">
+      <input type="text" name="firstName" placeholder="First name" autocomplete="given-name">
+      <input type="email" name="email" placeholder="Email address" autocomplete="email" required>
+      <button class="btn" type="submit">Get the schedule</button>
+      <p id="mailingListStatus" aria-live="polite"></p>
+    </form>
   </div>
 </section>
 
@@ -576,25 +583,29 @@
   </div>
 </section>
 
-<section id="booking">
-  <div class="container split">
-    <div>
-      <h2>Booking</h2>
-      <p>
-        If you’re connected to a venue, event, or room and think this would be a good fit, feel free to reach out.
-      </p>
-    </div>
-    <div>
-      <input type="text" placeholder="Name">
-      <input type="email" placeholder="Email">
-      <input type="text" placeholder="Venue">
-      <input type="text" placeholder="Date">
-      <input type="text" placeholder="Message">
-      <a class="btn" href="#">Send</a>
-    </div>
-  </div>
-</section>
+  <section id="contact">
+    <div class="container split">
+      <div>
+        <h2>Contact DeanoUno</h2>
+        <p>
+          If you're interested in booking or just want to reach out, feel free to send a message.
+          I’ll get back to you as soon as I can.
+        </p>
+      </div>
 
+      <div>
+        <form id="contactForm">
+          <input type="text" id="contactName" placeholder="Name" required>
+          <input type="email" id="contactEmail" placeholder="Email" required>
+          <input type="text" id="contactVenue" placeholder="Venue (optional)">
+          <input type="text" id="contactDate" placeholder="Date (optional)">
+          <input type="text" id="contactMessage" placeholder="Message" required>
+          <button class="btn" type="submit">Send</button>
+        </form>
+        <p id="contactStatus"></p>
+      </div>
+    </div>
+  </section>
 <footer>
   <div class="container">
     DeanoUno · Southwest Florida
@@ -789,7 +800,86 @@
     }
   }
 
+  function setupMailingListForm() {
+    const form = document.getElementById('mailingListForm');
+    const statusEl = document.getElementById('mailingListStatus');
+
+    if (!form || !statusEl) return;
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const submitButton = form.querySelector('button[type="submit"]');
+      const formData = new FormData(form);
+      const firstName = String(formData.get('firstName') || '').trim();
+      const email = String(formData.get('email') || '').trim();
+
+      statusEl.textContent = 'Sending...';
+      if (submitButton) submitButton.disabled = true;
+
+      try {
+        const response = await fetch('/.netlify/functions/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ firstName, email })
+        });
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload?.message || 'Unable to join right now.');
+        }
+
+        form.reset();
+        statusEl.textContent = payload?.message || 'Thanks. You are on the list.';
+      } catch (error) {
+        statusEl.textContent = error.message || 'Unable to join right now.';
+      } finally {
+        if (submitButton) submitButton.disabled = false;
+      }
+    });
+  }
+
   loadEvents();
+  setupMailingListForm();
+   
+  function setupContactForm() {
+    const form = document.getElementById('contactForm');
+    const statusEl = document.getElementById('contactStatus');
+
+    if (!form || !statusEl) return;
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const name = document.getElementById('contactName').value.trim();
+      const email = document.getElementById('contactEmail').value.trim();
+      const venue = document.getElementById('contactVenue').value.trim();
+      const date = document.getElementById('contactDate').value.trim();
+      const message = document.getElementById('contactMessage').value.trim();
+
+      const body = `Name: ${name}
+  Email: ${email}
+  Venue: ${venue}
+  Date: ${date}
+
+  Message:
+  ${message}`;
+
+      const mailtoLink = `mailto:duskduo@gmail.com?subject=Booking Inquiry&body=${encodeURIComponent(body)}`;
+
+      window.location.href = mailtoLink;
+
+      form.reset();
+      statusEl.textContent = 'I youe email clieant does not open automatically, please email me direcrly';
+      
+      setTimeout(() => {
+        statusEl.textContent = '';
+      }, 5000);
+    });
+  }
+    setupContactForm();
 </script>
 </body>
 </html>
