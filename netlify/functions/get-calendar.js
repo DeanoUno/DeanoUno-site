@@ -230,11 +230,8 @@ exports.handler = async function () {
         const link = linkMatch ? linkMatch[0] : null;
 
         const title = (event.summary || "Untitled event")
-          .replace(": Club Gig (Confirmed)", "")
-          .replace(": Private Party (Confirmed)", "")
-          .replace(": Restaurant Gig (Confirmed)", "")
+          .replace(/\s*:\s*.*$/, "")
           .trim();
-
         const description = rawDescription
           .replace(/<[^>]*>/g, "")
           .split("\n\n")[0]
