@@ -32,9 +32,10 @@ exports.handler = async function (event) {
     return jsonResponse(400, { success: false, message: "Please enter a valid email address." });
   }
 
-  const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
+  const kitApiKey = process.env.KIT_API_KEY;
+  const kitFormId = process.env.KIT_FORM_ID;
 
-  if (!webhookUrl) {
+  if (!kitApiKey || !kitFormId) {
     return jsonResponse(503, {
       success: false,
       message: "The mailing list is not connected yet. Please try again soon."
@@ -42,57 +43,30 @@ exports.handler = async function (event) {
   }
 
   try {
-    const response = await fetch(webhookUrl, {
+    const response = await fetch(`https://api.convertkit.com/v3/forms/${kitFormId}/subscribe`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        api_key: kitApiKey,
         email,
         first_name: firstName,
-        source: "deanouno-site",
-        submittedAt: new Date().toISOString()
+        source: "deanouno-site"
       })
     });
 
-    const text = await response.text();
-
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch {
-      return jsonResponse(502, {
-        success: false,
-        message: "Mailing list service returned an unreadable response.",
-        raw: text
-      });
-    }
+    const result = await response.json();
 
     if (!response.ok) {
       return jsonResponse(502, {
         success: false,
-        message: result.error || "Unable to join right now. Please try again later."
-      });
-    }
-
-    if (!result.success) {
-      return jsonResponse(502, {
-        success: false,
-        message: result.error || "Unable to save your signup right now."
-      });
-    }
-
-    if (result.duplicate) {
-      return jsonResponse(200, {
-        success: true,
-        duplicate: true,
-        message: "You are already on the list."
+        message: result.message || "Unable to join right now. Please try again later."
       });
     }
 
     return jsonResponse(200, {
       success: true,
-      duplicate: false,
       message: "Thanks. You are on the list."
     });
 
