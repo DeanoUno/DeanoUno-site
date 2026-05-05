@@ -36,6 +36,9 @@ exports.handler = async function (event) {
     return jsonResponse(503, { success: false, message: "The mailing list is not connected yet. Please try again soon." });
   }
 
+      console.log("KIT_FORM_ID:", kitFormId);
+      console.log("Submitting subscriber to Kit:", email);
+  
   try {
     const createResponse = await fetch("https://api.kit.com/v4/subscribers", {
       method: "POST",
@@ -72,8 +75,9 @@ exports.handler = async function (event) {
       })
     });
 
-    if (!formResponse.ok) {
-      throw new Error("Subscriber was created, but could not be added to the form.");
+        if (!formResponse.ok) {
+      const formError = await formResponse.text();
+      throw new Error(`Subscriber was created, but could not be added to the form. Kit said: ${formError}`);
     }
 
     return jsonResponse(200, {
@@ -81,7 +85,9 @@ exports.handler = async function (event) {
       message: "Thanks. You are on the list."
     });
 
-  } catch (err) {
+    } catch (err) {
+    console.error("Kit signup error:", err);
+
     return jsonResponse(502, {
       success: false,
       message: "Unable to join right now. Please try again later.",
