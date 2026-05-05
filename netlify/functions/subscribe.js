@@ -53,10 +53,11 @@ exports.handler = async function (event) {
     });
 
     const createResult = await createResponse.json();
+  console.log("Create subscriber response:", createResult);
 
-    if (!createResponse.ok) {
-      throw new Error(createResult?.message || "Unable to create subscriber.");
-    }
+  if (!createResponse.ok) {
+    throw new Error(JSON.stringify(createResult));
+  }
 
     const subscriberId = createResult?.subscriber?.id;
 
@@ -75,9 +76,11 @@ exports.handler = async function (event) {
       })
     });
 
-        if (!formResponse.ok) {
-      const formError = await formResponse.text();
-      throw new Error(`Subscriber was created, but could not be added to the form. Kit said: ${formError}`);
+          const formResult = await formResponse.text();
+    console.log("Add to form response:", formResult);
+
+    if (!formResponse.ok) {
+      throw new Error(`Add to form failed: ${formResult}`);
     }
 
     return jsonResponse(200, {
