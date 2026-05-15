@@ -645,6 +645,13 @@
     <form class="email-box" id="mailingListForm">
       <input type="text" name="firstName" placeholder="First name" autocomplete="given-name">
       <input type="email" name="email" placeholder="Email address" autocomplete="email" required>
+      <input
+              type="text"
+              name="website"
+              tabindex="-1"
+              autocomplete="off"
+              style="position:absolute; left:-9999px;"
+            >
       <button class="btn" type="submit">Get the schedule</button>
       <p id="mailingListStatus" aria-live="polite"></p>
     </form>
@@ -879,7 +886,7 @@
     }
   }
 
-  function setupMailingListForm() {
+    function setupMailingListForm() {
     const form = document.getElementById('mailingListForm');
     const statusEl = document.getElementById('mailingListStatus');
 
@@ -892,6 +899,13 @@
       const formData = new FormData(form);
       const firstName = String(formData.get('firstName') || '').trim();
       const email = String(formData.get('email') || '').trim();
+      const website = String(formData.get('website') || '').trim();
+
+      if (website) {
+        form.reset();
+        statusEl.textContent = 'Thanks. You are on the list.';
+        return;
+      }
 
       statusEl.textContent = 'Sending...';
       if (submitButton) submitButton.disabled = true;
@@ -902,23 +916,24 @@
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ firstName, email })
+          body: JSON.stringify({ firstName, email, website })
         });
+
         const payload = await response.json();
 
         if (!response.ok) {
           throw new Error(payload?.message || 'Unable to join right now.');
         }
 
-       form.reset();
-      statusEl.textContent = payload?.message || 'Thanks. You are on the list.';
+        form.reset();
+        statusEl.textContent = payload?.message || 'Thanks. You are on the list.';
 
-      if (typeof gtag === 'function') {
-        gtag('event', 'mailing_list_signup', {
-          event_category: 'engagement',
-          event_label: 'DeanoUno Email List'
-        });
-      }
+        if (typeof gtag === 'function') {
+          gtag('event', 'mailing_list_signup', {
+            event_category: 'engagement',
+            event_label: 'DeanoUno Email List'
+          });
+        }
       } catch (error) {
         statusEl.textContent = error.message || 'Unable to join right now.';
       } finally {
