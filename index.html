@@ -910,8 +910,15 @@
           throw new Error(payload?.message || 'Unable to join right now.');
         }
 
-        form.reset();
-        statusEl.textContent = payload?.message || 'Thanks. You are on the list.';
+       form.reset();
+      statusEl.textContent = payload?.message || 'Thanks. You are on the list.';
+
+      if (typeof gtag === 'function') {
+        gtag('event', 'mailing_list_signup', {
+          event_category: 'engagement',
+          event_label: 'DeanoUno Email List'
+        });
+      }
       } catch (error) {
         statusEl.textContent = error.message || 'Unable to join right now.';
       } finally {
