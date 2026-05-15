@@ -36,8 +36,6 @@ exports.handler = async function (event) {
     return jsonResponse(503, { success: false, message: "The mailing list is not connected yet. Please try again soon." });
   }
 
-      console.log("KIT_FORM_ID:", kitFormId);
-      console.log("Submitting subscriber to Kit:", email);
   
   try {
     const createResponse = await fetch("https://api.kit.com/v4/subscribers", {
@@ -53,8 +51,8 @@ exports.handler = async function (event) {
     });
 
     const createResult = await createResponse.json();
-  console.log("Create subscriber response:", createResult);
 
+    
   if (!createResponse.ok) {
     throw new Error(JSON.stringify(createResult));
   }
@@ -77,7 +75,6 @@ exports.handler = async function (event) {
     });
 
           const formResult = await formResponse.text();
-    console.log("Add to form response:", formResult);
 
     if (!formResponse.ok) {
       throw new Error(`Add to form failed: ${formResult}`);
@@ -89,7 +86,6 @@ exports.handler = async function (event) {
     });
 
     } catch (err) {
-    console.error("Kit signup error:", err);
 
     return jsonResponse(502, {
       success: false,
