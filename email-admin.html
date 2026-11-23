@@ -1,0 +1,250 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>DeanoUno | Weekly Email Preview</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f1f3f6;
+      color: #243047;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      background: #18243b;
+      color: white;
+      padding: 26px 20px;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 6px; }
+    header p { margin: 0; color: #cbd5e1; }
+    main {
+      max-width: 850px;
+      margin: 30px auto;
+      padding: 0 16px 50px;
+    }
+    .panel {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px #0000000d;
+    }
+    .label {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+    .subject {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 18px;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    button {
+      background: #2463a6;
+      color: white;
+      border: 0;
+      border-radius: 7px;
+      padding: 12px 17px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    button:hover { background: #194c83; }
+    button:disabled { opacity: .5; cursor: wait; }
+    .secondary { background: #475569; }
+    .secondary:hover { background: #334155; }
+    #preview {
+      background: white;
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 8px;
+      min-height: 180px;
+    }
+    #status { margin: 14px 0; color: #475569; }
+    .note { font-size: 13px; color: #64748b; }
+    @media(max-width:600px) {
+      .panel { padding: 16px; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DeanoUno</h1>
+    <p>Weekly Email Generator</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="label">This Week's Newsletter</div>
+      <div id="subject" class="subject">Loading...</div>
+      <div id="count"></div>
+      <p id="status" role="status"></p>
+      <div class="buttons">
+        <button id="refresh">Refresh Schedule</button>
+        <button id="copySubject" class="secondary">
+          Copy Subject
+        </button>
+        <button id="copyEmail">
+          Copy Formatted Email
+        </button>
+        <button id="copyText" class="secondary">
+          Copy Plain Text
+        </button>
+      </div>
+      <p class="note">
+        Preview only. No emails are sent from this page.
+      </p>
+    </section>
+
+    <section class="panel">
+      <div class="label">Email Preview</div>
+      <div id="preview">Loading weekly schedule...</div>
+    </section>
+  </main>
+
+  <script>
+    let newsletter = null;
+
+    const status = document.getElementById("status");
+    const subject = document.getElementById("subject");
+    const count = document.getElementById("count");
+    const preview = document.getElementById("preview");
+
+    const buttons = [
+      "refresh", "copySubject", "copyEmail", "copyText"
+    ].map(id => document.getElementById(id));
+
+    function setButtonsDisabled(value) {
+      buttons.forEach(button => button.disabled = value);
+    }
+
+    async function loadNewsletter() {
+      newsletter = null;
+      setButtonsDisabled(true);
+      status.textContent = "Retrieving latest performances...";
+      subject.textContent = "Loading...";
+      count.textContent = "";
+      preview.textContent = "Loading weekly schedule...";
+
+      try {
+        const response = await fetch(
+          "/.netlify/functions/generate-weekly-email",
+          { cache: "no-store" }
+        );
+
+        if (!response.ok) {
+          throw new Error("Server returned " + response.status);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.message || "Generation failed");
+        }
+
+        newsletter = data;
+        subject.textContent = data.subject;
+        count.textContent =
+          data.eventCount + " performance(s) through Sunday";
+
+        preview.innerHTML = data.html;
+        status.textContent = "Newsletter ready to review.";
+      } catch (error) {
+        subject.textContent = "Unable to load newsletter";
+        preview.textContent = "Please try Refresh Schedule.";
+        status.textContent = error.message;
+      } finally {
+        setButtonsDisabled(false);
+      }
+    }
+
+    async function copyText(value) {
+      await navigator.clipboard.writeText(value);
+    }
+
+    async function copyFormattedEmail() {
+      if (!newsletter) return;
+
+      if (!window.ClipboardItem ||
+          !navigator.clipboard.write) {
+        throw new Error(
+          "Formatted copying is not supported in this browser."
+        );
+      }
+
+      const htmlBlob = new Blob(
+        [newsletter.html],
+        { type: "text/html" }
+      );
+
+      const textBlob = new Blob(
+        [newsletter.plainText],
+        { type: "text/plain" }
+      );
+
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": htmlBlob,
+          "text/plain": textBlob
+        })
+      ]);
+    }
+
+    async function performCopy(action, successMessage) {
+      if (!newsletter) {
+        status.textContent = "Load the newsletter first.";
+        return;
+      }
+
+      try {
+        await action();
+        status.textContent = successMessage;
+      } catch (error) {
+        status.textContent =
+          "Copy failed: " + error.message;
+      }
+    }
+
+    document.getElementById("refresh")
+      .addEventListener("click", loadNewsletter);
+
+    document.getElementById("copySubject")
+      .addEventListener("click", () =>
+        performCopy(
+          () => copyText(newsletter.subject),
+          "Subject copied."
+        )
+      );
+
+    document.getElementById("copyEmail")
+      .addEventListener("click", () =>
+        performCopy(
+          copyFormattedEmail,
+          "Formatted email copied. Paste it into Kit."
+        )
+      );
+
+    document.getElementById("copyText")
+      .addEventListener("click", () =>
+        performCopy(
+          () => copyText(newsletter.plainText),
+          "Plain-text email copied."
+        )
+      );
+
+    loadNewsletter();
+  </script>
+</body>
+</html>
