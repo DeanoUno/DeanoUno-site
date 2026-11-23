@@ -4,6 +4,12 @@ const { handler: getCalendar } = require("./get-calendar");
 const TIME_ZONE = "America/New_York";
 const MARVILLA_URL = "https://www.marvillamarzan.com/";
 
+const COLORS = {
+  white: "#FFFFFF",
+  gold: "#F4D28A",
+  light: "#E8E8E8"
+};
+
 function escapeHTML(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -34,8 +40,9 @@ function dateKey(parts) {
 
 function getWeekEnd(now) {
   const p = localDateParts(now);
-  const weekdays = ["Sun", "Mon", "Tue", "Wed",
-    "Thu", "Fri", "Sat"];
+  const weekdays = [
+    "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+  ];
 
   const daysUntilSunday =
     (7 - weekdays.indexOf(p.weekday)) % 7;
@@ -101,25 +108,70 @@ function formatEvent(event) {
   const location = event.location || "";
   const withMarvilla = Boolean(event.companionNote);
 
-  const venueHTML = escapeHTML(venue);
-  const locationHTML = escapeHTML(location);
-
-  const directionsHTML = location
-    ? `<a href="${escapeHTML(mapsLink(location))}">Get directions</a>`
-    : "";
-
-  const marvillaHTML = withMarvilla
-    ? `<p>Performing with <a href="${MARVILLA_URL}">Marvilla Marzan</a></p>`
-    : "";
+  const baseStyle =
+    "font-family:Arial,Helvetica,sans-serif;" +
+    "text-align:right;";
 
   const html = `
-    <div style="margin-bottom:26px;">
-      <h3 style="margin:0 0 5px;">${escapeHTML(date)}</h3>
-      <p style="margin:0;"><strong>${venueHTML}</strong></p>
-      <p style="margin:4px 0;">${escapeHTML(time)}</p>
-      ${location ? `<p style="margin:4px 0;">${locationHTML}</p>` : ""}
-      ${directionsHTML ? `<p style="margin:4px 0;">${directionsHTML}</p>` : ""}
-      ${marvillaHTML}
+    <div style="${baseStyle}margin:0 0 32px 0;">
+
+      <p style="${baseStyle}
+                color:${COLORS.white};
+                font-size:21px;
+                font-weight:700;
+                line-height:1.4;
+                margin:0 0 12px 0;">
+        ${escapeHTML(date)}
+      </p>
+
+      <p style="${baseStyle}
+                color:${COLORS.gold};
+                font-size:19px;
+                font-weight:700;
+                line-height:1.4;
+                margin:0 0 9px 0;">
+        ${escapeHTML(venue)}
+      </p>
+
+      <p style="${baseStyle}
+                color:${COLORS.white};
+                font-size:17px;
+                line-height:1.5;
+                margin:0 0 9px 0;">
+        ${escapeHTML(time)}
+      </p>
+
+      ${location ? `
+      <p style="${baseStyle}
+                color:${COLORS.light};
+                font-size:15px;
+                line-height:1.5;
+                margin:0 0 9px 0;">
+        ${escapeHTML(location)}
+      </p>
+
+      <p style="${baseStyle}
+                font-size:15px;
+                margin:0 0 9px 0;">
+        <a href="${escapeHTML(mapsLink(location))}"
+           style="color:${COLORS.gold};
+                  text-decoration:underline;">
+          Get directions
+        </a>
+      </p>` : ""}
+
+      ${withMarvilla ? `
+      <p style="${baseStyle}
+                color:${COLORS.white};
+                font-size:15px;
+                margin:0;">
+        With
+        <a href="${MARVILLA_URL}"
+           style="color:${COLORS.gold};">
+          Marvilla Marzan
+        </a>
+      </p>` : ""}
+
     </div>`;
 
   const plain = [
@@ -185,34 +237,28 @@ exports.handler = async function () {
       formatShortDate(now.toISOString())
     } through ${formatShortDate(sundayDate.toISOString())}`;
 
-    const intro = "Here's where I'll be playing this week!";
-
+    // Only the schedule is generated.
+    // Kit supplies the photograph, heading and footer.
     const html = `
-      <div style="font-family:Arial,sans-serif;
-                  max-width:600px;margin:auto;
-                  color:#222;line-height:1.6;">
-        <h1 style="text-align:center;">DeanoUno</h1>
-        <p>${intro}</p>
+      <div style="font-family:Arial,Helvetica,sans-serif;
+                  text-align:right;
+                  color:#FFFFFF;
+                  line-height:1.5;
+                  width:100%;">
+
         ${
           formatted.length
             ? formatted.map(item => item.html).join("\n")
-            : "<p>No remaining public performances this week.</p>"
+            : `<p style="color:#FFFFFF;text-align:right;">
+                 No remaining public performances this week.
+               </p>`
         }
-        <p>Hope to see you there!</p>
-        <p>DeanoUno</p>
+
       </div>`;
 
-    const plainText = [
-      "DeanoUno",
-      intro,
-      "",
-      formatted.length
-        ? formatted.map(item => item.plain).join("\n\n")
-        : "No remaining public performances this week.",
-      "",
-      "Hope to see you there!",
-      "DeanoUno"
-    ].join("\n");
+    const plainText = formatted.length
+      ? formatted.map(item => item.plain).join("\n\n")
+      : "No remaining public performances this week.";
 
     return jsonResponse(200, {
       success: true,
@@ -224,7 +270,10 @@ exports.handler = async function () {
     });
 
   } catch (error) {
-    console.error("Weekly email generation failed:", error.message);
+    console.error(
+      "Weekly email generation failed:",
+      error.message
+    );
 
     return jsonResponse(500, {
       success: false,
